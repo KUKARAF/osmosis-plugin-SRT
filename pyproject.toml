@@ -1,0 +1,38 @@
+[project]
+name = "osmosis-media"
+version = "0.1.0"
+description = "NLP pipeline for extracting vocabulary from subtitles for language learning"
+requires-python = ">=3.11"
+dependencies = [
+    "spacy>=3.7",
+    "simplemma>=1.1",
+    "httpx>=0.28",
+    "click>=8.0",
+]
+
+[project.optional-dependencies]
+# Install language models with: pip install osmosis-media[es]
+# Or manually: python -m spacy download es_core_news_md
+es = ["es-core-news-md @ https://github.com/explosion/spacy-models/releases/download/es_core_news_md-3.8.0/es_core_news_md-3.8.0-py3-none-any.whl"]
+en = ["en-core-web-md @ https://github.com/explosion/spacy-models/releases/download/en_core_web_md-3.8.0/en_core_web_md-3.8.0-py3-none-any.whl"]
+fr = ["fr-core-news-md @ https://github.com/explosion/spacy-models/releases/download/fr_core_news_md-3.8.0/fr_core_news_md-3.8.0-py3-none-any.whl"]
+de = ["de-core-news-md @ https://github.com/explosion/spacy-models/releases/download/de_core_news_md-3.8.0/de_core_news_md-3.8.0-py3-none-any.whl"]
+ja = ["ja-core-news-md @ https://github.com/explosion/spacy-models/releases/download/ja_core_news_md-3.8.0/ja_core_news_md-3.8.0-py3-none-any.whl"]
+pt = ["pt-core-news-md @ https://github.com/explosion/spacy-models/releases/download/pt_core_news_md-3.8.0/pt_core_news_md-3.8.0-py3-none-any.whl"]
+dev = ["pytest>=8", "pytest-asyncio>=0.24"]
+
+[project.scripts]
+osmosis-media = "osmosis_media.cli:cli"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["osmosis_media"]
+
+[tool.hatch.metadata]
+allow-direct-references = true
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
