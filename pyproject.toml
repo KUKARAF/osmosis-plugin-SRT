@@ -22,6 +22,9 @@ ja = ["ja-core-news-md @ https://github.com/explosion/spacy-models/releases/down
 pt = ["pt-core-news-md @ https://github.com/explosion/spacy-models/releases/download/pt_core_news_md-3.8.0/pt_core_news_md-3.8.0-py3-none-any.whl"]
 dev = ["pytest>=8", "pytest-asyncio>=0.24"]
 
+[project.entry-points."osmosis.plugins"]
+media = "osmosis_media.plugin:MediaPlugin"
+
 [project.scripts]
 osmosis-media = "osmosis_media.cli:cli"
 
