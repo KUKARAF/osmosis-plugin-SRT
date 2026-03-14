@@ -139,18 +139,15 @@ def _extract_spacy(nlp, lines, freq, forms, examples, pos_result):
 def _extract_simplemma(language, lines, freq, forms, examples, pos_result):
     try:
         import simplemma
-        langdata = simplemma.load_data(language)
-    except (ImportError, ValueError):
-        # Last resort: no lemmatisation at all, just lowercase tokens
-        langdata = None
+    except ImportError:
+        simplemma = None
 
     for line in lines:
         for token in _TOKEN_RE.findall(line.lower()):
             if len(token) < 2:
                 continue
-            if langdata is not None:
-                import simplemma
-                lemma = simplemma.lemmatize(token, langdata)
+            if simplemma is not None:
+                lemma = simplemma.lemmatize(token, lang=language)
             else:
                 lemma = token
             freq[lemma] += 1
