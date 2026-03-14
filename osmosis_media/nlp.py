@@ -56,6 +56,9 @@ _POS_MAP = {
 
 _model_cache: dict[str, object] = {}
 
+# Reject lemmas containing digits, underscores, or other non-letter chars
+_JUNK_LEMMA = re.compile(r"[0-9_\\/:;,.{}]")
+
 # Simplemma token pattern: unicode letters including accented chars
 _TOKEN_RE = re.compile(r"\b\w{2,}\b", re.UNICODE)
 
@@ -127,7 +130,7 @@ def _extract_spacy(nlp, lines, freq, forms, examples, pos_result):
             ):
                 continue
             lemma = token.lemma_.lower().strip()
-            if len(lemma) < 2:
+            if len(lemma) < 2 or _JUNK_LEMMA.search(lemma):
                 continue
             freq[lemma] += 1
             forms[lemma].add(token.text.lower())
@@ -155,6 +158,8 @@ def _extract_simplemma(language, lines, freq, forms, examples, pos_result):
                 lemma = simplemma.lemmatize(token, lang=language)
             else:
                 lemma = token
+            if _JUNK_LEMMA.search(lemma):
+                continue
             freq[lemma] += 1
             forms[lemma].add(token)
             if lemma not in examples:
