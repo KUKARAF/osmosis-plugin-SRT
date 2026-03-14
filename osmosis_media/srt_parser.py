@@ -12,6 +12,12 @@ _ASS_SECTION = re.compile(r"^\[.+\]\s*$")
 # ASS hard-newline markers and inline override tags
 _ASS_NEWLINE = re.compile(r"\\[Nn]")
 _ASS_TAGS = re.compile(r"\{\\[^}]*\}")
+# Style/name patterns that indicate sign, title card, or non-dialogue overlay events.
+# Matches fansub conventions: Cart_*, cartel, sign, OP/ED karaoke, typesetting, etc.
+_SIGN_STYLE = re.compile(
+    r"(?i)sign|cartel|cart_|typeset|caption|credit|karaoke|kfx|romaji|op_|ed_|"
+    r"^(?:op|ed)$|title(?!_default)"
+)
 
 
 def _detect_format(content: str) -> str | None:
@@ -38,6 +44,9 @@ def parse_lines(srt: str) -> list[str]:
     lines = []
     for event in subs:
         if event.is_comment:
+            continue
+        # Skip sign/cartel/title-card events (non-dialogue overlays common in ASS fansubs)
+        if _SIGN_STYLE.search(event.style) or _SIGN_STYLE.search(event.name):
             continue
         text = event.plaintext.strip()
         if not text:
