@@ -65,9 +65,17 @@ class SubDLProvider:
             r.raise_for_status()
 
         with zipfile.ZipFile(io.BytesIO(r.content)) as zf:
-            srt_names = [n for n in zf.namelist() if n.lower().endswith(".srt")]
-            if not srt_names:
-                raise ValueError(f"No SRT file found in ZIP from {result.name!r}")
-            # Prefer the shortest name (usually the clean one, not a subfolder path)
-            srt_names.sort(key=len)
-            return zf.read(srt_names[0]).decode("utf-8", errors="replace")
+            # Accept common subtitle formats; prefer SRT, then ASS/SSA, then VTT
+            all_names = zf.namelist()
+            for ext_group in [(".srt",), (".ass", ".ssa"), (".vtt",)]:
+                matches = [
+                    n for n in all_names
+                    if n.lower().endswith(ext_group)
+                ]
+                if matches:
+                    matches.sort(key=len)
+                    return zf.read(matches[0]).decode("utf-8", errors="replace")
+            raise ValueError(
+                f"No subtitle file found in ZIP from {result.name!r}. "
+                f"ZIP contains: {all_names}"
+            )

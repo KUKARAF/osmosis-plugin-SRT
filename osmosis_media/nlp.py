@@ -140,6 +140,11 @@ def _extract_simplemma(language, lines, freq, forms, examples, pos_result):
     try:
         import simplemma
     except ImportError:
+        warnings.warn(
+            "simplemma not installed. Lemmatization disabled — "
+            "raw tokens will be used. Run: pip install simplemma",
+            stacklevel=2,
+        )
         simplemma = None
 
     for line in lines:
