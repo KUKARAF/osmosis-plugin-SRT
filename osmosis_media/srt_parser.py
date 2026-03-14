@@ -1,34 +1,29 @@
 import re
 
-_SEQUENCE = re.compile(r"^\d+$")
-_TIMESTAMP = re.compile(r"\d{2}:\d{2}:\d{2}[,\.]\d{3}\s*-->")
-_HTML_TAG = re.compile(r"<[^>]+>")
-_ASS_TAG = re.compile(r"\{[^}]+\}")  # ASS/SSA override tags like {\an8}
+import pysubs2
+
 _SDH_NOTE = re.compile(r"^\[.*?\]$|^\(.*?\)$")  # [Music] (applause)
 
 
 def parse_lines(srt: str) -> list[str]:
     """
-    Strip SRT formatting and return clean dialogue lines.
+    Strip subtitle formatting and return clean dialogue lines.
 
-    Removes: sequence numbers, timestamps, HTML/ASS tags, SDH annotations.
+    Auto-detects SRT, ASS/SSA, and VTT via pysubs2.
+    Removes: inline tags, comments, SDH annotations.
     Preserves: the actual spoken dialogue text.
     """
+    subs = pysubs2.SSAFile.from_string(srt)
     lines = []
-    for line in srt.splitlines():
-        line = line.strip()
-        if not line:
+    for event in subs:
+        if event.is_comment:
             continue
-        if _SEQUENCE.match(line):
+        text = event.plaintext.strip()
+        if not text:
             continue
-        if _TIMESTAMP.search(line):
-            continue
-        line = _HTML_TAG.sub("", line)
-        line = _ASS_TAG.sub("", line)
-        line = line.strip()
-        if not line:
-            continue
-        if _SDH_NOTE.match(line):
-            continue
-        lines.append(line)
+        for line in text.split("\n"):
+            line = line.strip()
+            if not line or _SDH_NOTE.match(line):
+                continue
+            lines.append(line)
     return lines
