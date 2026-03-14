@@ -8,6 +8,9 @@ from osmosis_media.providers.base import SubtitleResult
 
 _API = "https://api.subdl.com/api/v1/subtitles"
 _DL = "https://dl.subdl.com"
+_HEADERS = {
+    "User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:137.0) Gecko/20100101 Firefox/137.0",
+}
 
 
 class SubDLProvider:
@@ -55,7 +58,9 @@ class SubDLProvider:
 
     async def download(self, result: SubtitleResult) -> str:
         url = f"{_DL}{result.url}"
-        async with httpx.AsyncClient(timeout=60.0, follow_redirects=True) as client:
+        async with httpx.AsyncClient(
+            timeout=60.0, follow_redirects=True, headers=_HEADERS
+        ) as client:
             r = await client.get(url)
             r.raise_for_status()
 
