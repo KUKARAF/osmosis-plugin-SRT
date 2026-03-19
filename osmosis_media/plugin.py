@@ -1,6 +1,8 @@
 """osmosis-media plugin — declares goal actions for media types."""
 from __future__ import annotations
 
+from pathlib import Path
+
 
 class MediaPlugin:
     name = "media"
@@ -25,7 +27,15 @@ class MediaPlugin:
                 "id": "import_subtitles",
                 "label": "Import Vocab",
             },
+            {
+                "media_types": ["series", "movie", "book"],
+                "id": "upload_subtitles",
+                "label": "Upload SRT",
+            },
         ]
+
+    def get_prompts_dir(self):
+        return None
 
     async def on_startup(self, app):
         pass
